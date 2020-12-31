@@ -48,12 +48,75 @@
 <script type="riot/tag">
   <web-app>
   	<style>
+        .web-app a {
+            color: #00f;
+        }
+
+        .web-app h1 {
+            color: #999;
+        }
+
+        .web-app .wordoftheday {
+            font-size: 10vw;
+            color: #333;
+        }
+
+        .web-app pre {
+            max-height: 40vh;
+            color: #999;
+            border: 1px solid #ddd;
+        }
     </style>
   	<div class="web-app">
-        <h1>EJ's Word Gen</h1>
+        <div class="row">
+            <div class="col text-center">
+                <h1>EJ's Word Generator</h1>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col text-center">
+                <span class="wordoftheday">{ word }</span><br/>
+            </div>
+        </div>
+
+        <div class="row text-center">
+            <div class="col">
+                <a href="#">Words Archive</a>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <pre>{ wordsArchive }</pre>
+            </div>
+        </div>
     </div>
 
     let tag = this
+
+    tag.word = ""
+    tag.updated = ""
+    tag.wordsArchive = ""
+
+    $.getJSON("./data/write10-word-of-the-day.json", (data) => {
+        tag.update({
+            word: data.word,
+            updated: data.timestamp
+        })
+    })
+
+    $.get("./data/write10-words-archive.tsv", (data) => {
+        if( data ) {
+            let wordsArr = data.split("\n")
+
+            if(wordsArr && wordsArr.length) {
+                tag.update({
+                    wordsArchive: wordsArr.reverse().join("\n")
+                })
+            }
+        }
+    })
     
   </web-app>
 </script>
@@ -73,13 +136,7 @@
 	        let parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, (m,key,value) => vars[key] = value)
 			return vars
 		}
-
         
-        setTimeout(() => {
-            Split(["#venn-1", "#venn-2", "#venn-3"]);
-        }, 0)
-        
-
 		riot.mount("*")
 	});
 </script>
